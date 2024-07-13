@@ -1,11 +1,16 @@
-﻿using Pastbin.Application.Interfaces;
+﻿using Microsoft.EntityFrameworkCore;
+using Pastbin.Application.Interfaces;
 using Pastbin.Application.Services;
 using Pastbin.Domain.Entities;
+using Pastbin.Infrastructure.DataAccess;
+using System.Text;
 namespace Pastbin.Infrastructure.Services
 {
     public class PostService : IPostService
     {
-        public Task<Post> CreateAsync(Post entity,string Text)
+        private readonly IFileService _fileService;
+        private readonly PastbinDbContext _db;
+        public PostService(IFileService fileService, PastbinDbContext db)
         {
             _db = db;
             _fileService = fileService;
@@ -18,7 +23,7 @@ namespace Pastbin.Infrastructure.Services
             {
                 string filename = $"{Guid.NewGuid()}.txt";
                 var response = await _fileService.UploadFileAsync("shokir-demo-bucket", memoryStream, filename, entity.ExpireHour, entity.User.Username);
-                
+
                 entity.UrlAWS = response.UploadedFilePath;
                 entity.HashUrl = string.Join("", HashGenerator.sha256_hash(response.UploadedFilePath).Select(x => x).Take(40));
                 entity.fileName = filename;
@@ -54,15 +59,16 @@ namespace Pastbin.Infrastructure.Services
         }
         public async Task<IEnumerable<Post>> GetAllAsync()
         {
-            throw new NotImplementedException();
+            var Posts = _db.Posts.ToList();
+            return Posts;
         }
 
-        public Task<Post> GetByIdAsync(int id)
+        public async Task<Post> GetByIdAsync(int id)
         {
-            throw new NotImplementedException();
+            return await _db.Posts.FirstOrDefaultAsync(x => x.Id == id);
         }
 
-        public Task<Post> UpdateAsync(int Id)
+        public Task<Post> UpdateAsync(Post post)
         {
             throw new NotImplementedException();
         }
