@@ -1,12 +1,13 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Pastbin.Application.Interfaces;
 using Pastbin.Domain.Entities;
+using Pastbin.Domain.Models;
 using Pastbin.Domain.Models.DTO;
 
 namespace Pastbin.UI.Controllers
 {
     [ApiController]
-    [Route("api/[controller]/[action]")]
+    [Route("pastbin/[controller]/[action]")]
     public class UserController : Controller
     {
         private readonly IUserService _userService;
@@ -14,25 +15,36 @@ namespace Pastbin.UI.Controllers
         {
             _userService = userService;
         }
-        [HttpPost("Create")]
-        public async Task<IActionResult> CreateAsync(UserCreateDTO userCreateDTO)
+        [HttpPost]
+        public async Task<ResponseModel<UserDTO>> CreateAsync(UserCreateDTO userCreateDTO)
         {
-            if (userCreateDTO == null) { return BadRequest("User is null"); }
+            if (userCreateDTO == null) { return new ("User is null"); }
             var hasInDb=await _userService.GetByUsername(userCreateDTO.Username);
-            if (hasInDb!=null) { return BadRequest("User has in Db"); }
+            if (hasInDb!=null) { return new("User has in Db"); }
             User newUser=new User() { 
             Username= userCreateDTO.Username,
             Password= userCreateDTO.Password
             };
             var response = await _userService.CreateAsync(newUser);
-            return Ok(response);
+            UserDTO responseModel = new()
+            {
+                Username = response.Username,
+                Posts = response.Posts.Select(p => p.Id).ToList()
+            };
+
+            return new(responseModel);
         }
 
-        [HttpGet("GetAll")]
-        public async Task<IActionResult> GetAllAsync()
+        [HttpGet]
+        public async Task<ResponseModel<IEnumerable<UserDTO>>> GetAllAsync()
         {
             var Users=await _userService.GetAllAsync();
-            return Ok(Users);
+            IEnumerable<UserDTO> responseList = Users.Select(p => new UserDTO()
+            {
+                Username = p.Username,
+                Posts = p.Posts.Select(a=>a.Id).ToList()
+            });
+            return new(responseList);
         }
 
     }

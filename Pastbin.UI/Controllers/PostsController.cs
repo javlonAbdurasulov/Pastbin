@@ -5,7 +5,7 @@ using Pastbin.Domain.Models.DTO;
 
 namespace Pastbin.UI.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("pastbin/[controller]")]
     [ApiController]
     public class PostsController : ControllerBase
     {
