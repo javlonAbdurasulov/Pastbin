@@ -24,7 +24,8 @@ namespace Pastbin.Infrastructure
             services.AddScoped<IFileService, FileService>();
 
             //Adding config for connect to s3 
-            services.AddDefaultAWSOptions(configuration.GetAWSOptions());
+            var awsOptions = configuration.GetAWSOptions();
+            services.AddDefaultAWSOptions(awsOptions);
             services.AddAWSService<IAmazonS3>();
 
             //Add db config

@@ -22,7 +22,7 @@ namespace Pastbin.Infrastructure.Services
             using (MemoryStream memoryStream = new MemoryStream(byteArray))
             {
                 string filename = $"{Guid.NewGuid()}.txt";
-                var response = await _fileService.UploadFileAsync("shokir-demo-bucket", memoryStream, filename, entity.ExpireHour, entity.User.Username);
+                var response = await _fileService.UploadFileAsync("pastbin-dotnet", memoryStream, filename, entity.ExpireHour, entity.User.Username);
 
                 entity.UrlAWS = response.UploadedFilePath;
                 entity.HashUrl = string.Join("", HashGenerator.sha256_hash(response.UploadedFilePath).Select(x => x).Take(40));
@@ -41,7 +41,7 @@ namespace Pastbin.Infrastructure.Services
 
             var post = await _db.Posts.FirstOrDefaultAsync(x => x.HashUrl == hashUrl);
 
-            bool response = await _fileService.DeleteFileAsync("shokir-demo-bucket", $"{username}/{post.fileName}");
+            bool response = await _fileService.DeleteFileAsync("pastbin-dotnet", $"{username}/{post.fileName}");
             if (response) return "Object successfully deleted";
 
             return "an error occurred while deleting";

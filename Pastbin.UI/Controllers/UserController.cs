@@ -29,7 +29,7 @@ namespace Pastbin.UI.Controllers
             UserDTO responseModel = new()
             {
                 Username = response.Username,
-                Posts = response.Posts.Select(p => p.Id).ToList()
+                Posts = new List<int>()
             };
 
             return new(responseModel);
@@ -42,7 +42,7 @@ namespace Pastbin.UI.Controllers
             IEnumerable<UserDTO> responseList = Users.Select(p => new UserDTO()
             {
                 Username = p.Username,
-                Posts = p.Posts.Select(a=>a.Id).ToList()
+                Posts = p.Posts==null ? new List<int>() : p.Posts.Select(a=>a.Id).ToList()
             });
             return new(responseList);
         }

@@ -12,7 +12,7 @@ using Pastbin.Infrastructure.DataAccess;
 namespace Pastbin.Infrastructure.Migrations
 {
     [DbContext(typeof(PastbinDbContext))]
-    [Migration("20241023110648_initdb")]
+    [Migration("20241024100952_initdb")]
     partial class initdb
     {
         /// <inheritdoc />

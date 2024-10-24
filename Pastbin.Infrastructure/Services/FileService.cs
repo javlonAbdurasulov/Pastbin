@@ -3,15 +3,25 @@ using Amazon.S3;
 using Pastbin.Domain.Models;
 using Pastbin.Domain.Models.DTO;
 using Pastbin.Application.Interfaces;
+using Amazon.Runtime;
+using Microsoft.Extensions.Configuration;
+using Amazon;
 
 namespace Pastbin.Infrastructure.Services
 {
     public class FileService: IFileService
     {
         private readonly IAmazonS3 _s3Client;
-        public FileService(IAmazonS3 s3Client)
+        private readonly IConfiguration _configuration;
+        public FileService(IAmazonS3 s3Client,IConfiguration configuration)
         {
-            _s3Client = s3Client;
+            _configuration = configuration;
+            var accessKey = configuration["AWS:AccessKey"];
+            var secretKey = configuration["AWS:SecretKey"];
+            var region = configuration["AWS:Region"];
+            var awsCredentials = new BasicAWSCredentials(accessKey, secretKey);
+            _s3Client = new AmazonS3Client(awsCredentials, RegionEndpoint.GetBySystemName(region));
+            
         }
         public async Task<UploadFileResponse> UploadFileAsync(string bucketName,Stream fileStream,string fileName,int? expireHour, string? prefix)
         {
