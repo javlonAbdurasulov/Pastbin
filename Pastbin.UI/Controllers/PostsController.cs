@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Pastbin.Application.Interfaces;
 using Pastbin.Domain.Entities;
+using Pastbin.Domain.Models;
 using Pastbin.Domain.Models.DTO;
 
 namespace Pastbin.UI.Controllers
@@ -51,11 +52,11 @@ namespace Pastbin.UI.Controllers
         }
 
         [HttpGet("GetAllFromUsername")]
-        public async Task<IActionResult> GetAllFromUsernameAsync(string Username)
+        public async Task<ResponseModel<IEnumerable<Post>>> GetAllFromUsernameAsync(string Username)
         {
             var Posts = await _postService.GetAllFromUsernameAsync(Username);
-            if (Posts == null) return NotFound("in db not exist");
-            return Ok(Posts);
+            if (Posts == null) return new("in db not exist");
+            return new(Posts);
         }
 
         [HttpGet("GetAll")]
