@@ -37,7 +37,7 @@ namespace Pastbin.Infrastructure.Services
         }
         public async Task<User> GetByIdAsync(int Id)
         {
-            User? user =await _db.Users.FirstOrDefaultAsync(x=> x.Id == Id);
+            User? user =await _db.Users.Include(x=>x.Posts).FirstOrDefaultAsync(x=> x.Id == Id);
             if (user == null)
             {
                 throw new Exception($"User with Id {Id} not found.");
@@ -47,7 +47,7 @@ namespace Pastbin.Infrastructure.Services
         }
         public async Task<User> GetByUsername(string username)
         {
-            User? User = await _db.Users.Where(x => x.Username == username).FirstOrDefaultAsync();
+            User? User = await _db.Users.Include(x=>x.Posts).FirstOrDefaultAsync(x => x.Username == username);
             if (User == null) return null;
             
             return User;

@@ -46,6 +46,20 @@ namespace Pastbin.UI.Controllers
             });
             return new(responseList);
         }
-
+        [HttpGet]
+        public async Task<ResponseModel<UserDTO>> GetByUsername(string username)
+        {
+            var user = await _userService.GetByUsername(username);
+            if (user == null)
+            {
+                return new("user с таким username не существует!");
+            }
+            UserDTO userDTO = new UserDTO()
+            {
+                Username = user.Username,
+                Posts = user.Posts == null ? new List<int>() : user.Posts.Select(a => a.Id).ToList()
+            };
+            return new(userDTO);
+        }
     }
 }
