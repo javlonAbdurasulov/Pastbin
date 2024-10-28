@@ -1,4 +1,5 @@
 ﻿using Pastbin.Domain.Entities;
+using Pastbin.Domain.Models;
 
 namespace Pastbin.Application.Interfaces
 {
@@ -6,6 +7,6 @@ namespace Pastbin.Application.Interfaces
     {
         public Task<IEnumerable<Post>> GetAllFromUsernameAsync(string username);
         public Task<Post> CreateAsync(Post post, string text);
-        public Task<string> DeleteAsync(string hashUrl, string username);
+        public Task<ResponseModel<string>> DeleteAsync(string hashUrl, string username);
     }
 }

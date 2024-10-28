@@ -2,6 +2,7 @@
 using Pastbin.Application.Interfaces;
 using Pastbin.Application.Services;
 using Pastbin.Domain.Entities;
+using Pastbin.Domain.Models;
 using Pastbin.Infrastructure.DataAccess;
 using System.Text;
 namespace Pastbin.Infrastructure.Services
@@ -34,17 +35,22 @@ namespace Pastbin.Infrastructure.Services
             await _db.SaveChangesAsync();
             return entity;
         }
-        public async Task<string> DeleteAsync(string hashUrl, string username)
+        public async Task<ResponseModel<string>> DeleteAsync(string hashUrl, string username)
         {
             var user = await _db.Users.FirstOrDefaultAsync(x => x.Username == username);
-            if (user == null) return $"{username} doesn't exist in database";
+            if (user == null) return new(error: $"{username} doesn't exist in database");
 
             var post = await _db.Posts.FirstOrDefaultAsync(x => x.HashUrl == hashUrl);
 
             bool response = await _fileService.DeleteFileAsync("pastbin-dotnet", $"{username}/{post.fileName}");
-            if (response) return "Object successfully deleted";
+            if (response)
+            {
+                _db.Posts.Remove(post);
+                await _db.SaveChangesAsync();
+                return new(result: "Object successfully deleted");
+            }
 
-            return "an error occurred while deleting";
+            return new(error: "an error occurred while deleting");
         }
 
         public async Task<IEnumerable<Post>> GetAllFromUsernameAsync(string username)

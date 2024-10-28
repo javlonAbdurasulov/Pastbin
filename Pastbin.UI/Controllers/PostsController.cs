@@ -19,11 +19,11 @@ namespace Pastbin.UI.Controllers
 
         }
         [HttpPost("Create")]
-        public async Task<IActionResult> CreatePost(PostDTO postDTO)
+        public async Task<ResponseModel<Post>> CreatePost(PostDTO postDTO)
         {
             User user = await _userService.GetByUsername(postDTO.UserName);
 
-            if (user == null) return NotFound($"User {postDTO.UserName} not found");
+            if (user == null) return new($"User {postDTO.UserName} not found");
 
             Post post = new Post()
             {
@@ -31,8 +31,8 @@ namespace Pastbin.UI.Controllers
                 User = user,
             };
 
-            var response = await _postService.CreateAsync(post, postDTO.Text);
-            return Ok(response.HashUrl);
+            Post response = await _postService.CreateAsync(post, postDTO.Text);
+            return new(response);
         }
 
         [HttpGet("{keyword}")]
@@ -65,10 +65,10 @@ namespace Pastbin.UI.Controllers
             return Ok(_postService.GetAllAsync());
         }
         [HttpDelete("Delete")]
-        public async Task<IActionResult> DeleteAsync(string hashUrl, string username)
+        public async Task<ResponseModel<string>> DeleteAsync(PostDeleteDTO postDeleteDTO)
         {
-            string result = await _postService.DeleteAsync(hashUrl, username);
-            return Ok(result);
+            ResponseModel<string> result = await _postService.DeleteAsync(postDeleteDTO.hashUrl, postDeleteDTO.username);
+            return result;
         }
 
     }
